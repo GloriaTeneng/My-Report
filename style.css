@@ -1,0 +1,45 @@
+:root {
+  --bleu: #0d6efd;     /* bleu Express */
+  --rouge: #b02a37;    /* rouge sobre */
+  --gris: #f8f9fa;
+}
+.btn-primary {
+  background-color: var(--bleu);
+}
+.btn-danger {
+  background-color: var(--rouge);
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f5f7fa;
+  justify-content: center;
+}
+
+.card {
+  border-radius: 14px;
+}
+
+.section-title {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  color: #6c757d;
+  margin-bottom: 10px;
+}
+
+.info-box {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.price {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #0d6efd;
+}
+
+.badge-vip {
+  background-color: #8b0000;
+}
