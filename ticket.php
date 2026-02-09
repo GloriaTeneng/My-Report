@@ -1,89 +1,86 @@
-<?php
-// Génération d'un ID de réservation unique (simulation)
-$reservation_id = "EV-RES-" . rand(100000, 999999);
-
-// Contenu du QR Code
-$qr_data = $reservation_id;
-
-// Génération du QR Code via API
-$qr_code_url = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" . urlencode($qr_data);
-?>
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Ticket - Express Voyage</title>
+<meta charset="UTF-8">
+<title>Mon Ticket - Express Voyage</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
 
-  <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+body{
+  font-family: Arial;
+  background:#f4f6f9;
+  padding:20px;
+}
 
-  <!-- Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+.ticket{
+  max-width:420px;
+  margin:auto;
+  background:white;
+  border-radius:10px;
+  padding:20px;
+  box-shadow:0 4px 10px rgba(0,0,0,.1);
+}
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="assets/css/style.css">
+h2{text-align:center;color:#003366}
+
+.line{
+  margin:6px 0;
+  font-size:15px;
+}
+
+#qrcode{
+  display:flex;
+  justify-content:center;
+  margin-top:15px;
+}
+
+button{
+  margin-top:15px;
+  width:100%;
+  padding:10px;
+  border:none;
+  border-radius:6px;
+  background:#003366;
+  color:white;
+  font-size:15px;
+  cursor:pointer;
+}
+</style>
 </head>
 
-<body class="bg-light">
+<body>
 
-<div class="container mt-5 mb-5">
+<div class="ticket" id="ticket">
+  <h2>🎫 Ticket électronique</h2>
 
-  <div class="card shadow-lg p-4">
+  <div class="line"><b>Client :</b> <span id="client"></span></div>
+  <div class="line"><b>Bus :</b> <span id="bus"></span></div>
+  <div class="line"><b>Sièges :</b> <span id="seats"></span></div>
+  <div class="line"><b>Montant :</b> <span id="total"></span></div>
+  <div class="line"><b>Statut :</b> <span id="status"></span></div>
 
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h4 class="text-primary">
-        <i class="bi bi-ticket-perforated"></i> Ticket de voyage
-      </h4>
-      <span class="badge bg-success">Réservation confirmée</span>
-    </div>
+  <div id="qrcode"></div>
 
-    <hr>
-
-    <div class="row">
-
-      <!-- INFOS VOYAGE -->
-      <div class="col-md-7">
-        <h5 class="mb-3">Informations du voyage</h5>
-
-        <p><strong>Référence :</strong> <?= $reservation_id ?></p>
-        <p><strong>Client :</strong> Gloria</p>
-        <p><strong>Trajet :</strong> Douala → Yaoundé</p>
-        <p><strong>Date :</strong> 20 Juin 2025</p>
-        <p><strong>Heure :</strong> 08h00</p>
-        <p><strong>Type de bus :</strong> VIP</p>
-        <p><strong>Sièges :</strong> A5, A6, A7</p>
-        <p><strong>Montant payé :</strong> <span class="text-primary fw-bold">18 000 FCFA</span></p>
-      </div>
-
-      <!-- QR CODE -->
-      <div class="col-md-5 text-center">
-        <h6 class="mb-3">QR Code</h6>
-        <img src="<?= $qr_code_url ?>" alt="QR Code Ticket" class="img-fluid mb-2">
-        <p class="text-muted small">
-          Présentez ce QR Code à l’embarquement
-        </p>
-      </div>
-
-    </div>
-
-    <hr>
-
-    <!-- ACTIONS -->
-    <div class="d-flex justify-content-end gap-2">
-      <button onclick="window.print()" class="btn btn-outline-primary">
-        <i class="bi bi-printer"></i> Imprimer
-      </button>
-      <a href="Accueil.php" class="btn btn-primary">
-        <i class="bi bi-house"></i> Accueil
-      </a>
-    </div>
-
-  </div>
-
+  <button onclick="window.print()">🖨 Imprimer le ticket</button>
 </div>
+
+<script>
+let ticket = JSON.parse(localStorage.getItem("ticket"));
+
+if(ticket){
+  document.getElementById("client").textContent = ticket.client;
+  document.getElementById("bus").textContent = ticket.busType.toUpperCase();
+  document.getElementById("seats").textContent = ticket.seats.join(", ");
+  document.getElementById("total").textContent = ticket.total.toLocaleString() + " FCFA";
+  document.getElementById("status").textContent = ticket.status;
+
+  new QRCode(document.getElementById("qrcode"), {
+    text: JSON.stringify(ticket),
+    width: 140,
+    height: 140
+  });
+}
+</script>
 
 </body>
 </html>

@@ -24,16 +24,56 @@
     <h4 class="text-white text-center">Express Voyage</h4>
     <hr class="text-light">
 
-    <ul class="nav flex-column">
-      <li class="nav-item active"><i class="bi bi-speedometer2"></i> Dashboard</li>
-      <li class="nav-item"><i class="bi bi-bus-front"></i> Bus</li>
-      <li class="nav-item"><i class="bi bi-geo-alt"></i> Trajets</li>
-      <li class="nav-item"><i class="bi bi-calendar-event"></i> Voyages</li>
-      <li class="nav-item"><i class="bi bi-ticket"></i> Réservations</li>
-      <li class="nav-item"><i class="bi bi-credit-card"></i> Paiements</li>
-      <li class="nav-item"><i class="bi bi-qr-code-scan"></i> Scanner QR</li>
-      <li class="nav-item"><i class="bi bi-bar-chart"></i> Statistiques</li>
-    </ul>
+           <ul class="nav flex-column">
+  <li class="nav-item">
+    <a href="Dashboard.php" class="nav-link text-white active">
+      <i class="bi bi-speedometer2"></i> Dashboard
+    </a>
+  </li>
+
+  <li class="nav-item">
+    <a href="Bus.php" class="nav-link text-white">
+      <i class="bi bi-bus-front"></i> Bus
+    </a>
+  </li>
+
+  <li class="nav-item">
+    <a href="Trajets.php" class="nav-link text-white">
+      <i class="bi bi-geo-alt"></i> Trajets
+    </a>
+  </li>
+
+  <li class="nav-item">
+    <a href="voyages.php" class="nav-link text-white">
+      <i class="bi bi-calendar-event"></i> Voyages
+    </a>
+  </li>
+
+  <li class="nav-item">
+    <a href="reservations.php" class="nav-link text-white">
+      <i class="bi bi-ticket"></i> Réservations
+    </a>
+  </li>
+
+  <li class="nav-item">
+    <a href="Paiements.php" class="nav-link text-white">
+      <i class="bi bi-credit-card"></i> Paiements
+    </a>
+  </li>
+
+  <li class="nav-item">
+    <a href="Scan.php" class="nav-link text-white">
+      <i class="bi bi-qr-code-scan"></i> Scanner QR
+    </a>
+  </li>
+
+  <li class="nav-item">
+    <a href="Stats.php" class="nav-link text-white">
+      <i class="bi bi-bar-chart"></i> Statistiques
+    </a>
+  </li>
+</ul>
+
   </div>
 
   <!-- Main -->
