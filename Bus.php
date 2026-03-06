@@ -2,147 +2,110 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Gestion des bus</title>
-<style>
-body{
-    font-family: Arial, sans-serif;
-    background:#f4f6f9;
-}
-.container{
-    max-width:900px;
-    margin:auto;
-    background:#fff;
-    padding:20px;
-    border-radius:8px;
-}
-input,select,button{
-    padding:10px;
-    margin:5px 0;
-    width:100%;
-}
-table{
-    width:100%;
-    border-collapse: collapse;
-    margin-top:20px;
-}
-th,td{
-    border:1px solid #ddd;
-    padding:10px;
-    text-align:center;
-}
-th{
-    background:#2563eb;
-    color:white;
-}
-button{
-    background:#2563eb;
-    color:white;
-    border:none;
-    border-radius:5px;
-}
-</style>
+<title>Gestion Bus</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="Dashboard.css">
 </head>
+
 <body>
 
-<div class="container">
-<h2>Gestion des bus</h2>
+<div class="container mt-4">
 
-<form id="busForm">
-    <input type="text" id="numero" placeholder="Numéro du bus" required>
+<h3>Gestion des Bus</h3>
 
-    <select id="type" required>
-        <option value="">-- Type du bus --</option>
-        <option value="VIP">VIP</option>
-        <option value="CLASSIQUE">Classique</option>
-    </select>
+<form id="busForm" class="row g-3">
 
-    <input type="number" id="rangees" placeholder="Nombre de rangées" required>
+<div class="col-md-3">
+<input type="text" id="numero" class="form-control" placeholder="Numéro Bus" required>
+</div>
 
-    <button>Ajouter</button>
+<div class="col-md-3">
+<select id="type" class="form-control">
+<option value="VIP">VIP</option>
+<option value="Classique">Classique</option>
+</select>
+</div>
+
+<div class="col-md-3">
+<input type="number" id="capacite" class="form-control" placeholder="Capacité">
+</div>
+
+<div class="col-md-3">
+<button class="btn btn-primary">Ajouter</button>
+</div>
+
 </form>
 
-<table>
+<hr>
+
+<table class="table table-bordered">
+
 <thead>
 <tr>
-<th>N°</th>
+<th>ID</th>
+<th>Numero</th>
 <th>Type</th>
-<th>Rangées</th>
-<th>Config</th>
 <th>Capacité</th>
-<th>Action</th>
 </tr>
 </thead>
-<tbody id="busTable"></tbody>
+
+<tbody id="listeBus"></tbody>
+
 </table>
 
 </div>
 
 <script>
-let busList = [];
 
-document.getElementById("busForm").addEventListener("submit", e => {
-    e.preventDefault();
+async function chargerBus(){
 
-    let numero = numero.value;
-    let type = type.value;
-    let rangees = parseInt(rangees.value);
+const res = await fetch("http://localhost/PROJET/Back-end/api/get_bus.php");
+const bus = await res.json();
 
-    let config = type === "VIP" ? "2-2" : "3-2";
-    let capacite = type === "VIP" ? rangees * 4 : rangees * 5;
+let html = "";
 
-    busList.push({numero, type, rangees, config, capacite});
+bus.forEach(b=>{
 
-    afficherBus();
-    e.target.reset();
+html += `
+<tr>
+<td>${b.MATRICULE_BUS}</td>
+<td>${b.NUMERO_BUS}</td>
+<td>${b.TYPE_BUS}</td>
+<td>${b.CAPACITE_BUS}</td>
+</tr>
+`;
+
 });
 
-function afficherBus(){
-    let html="";
-    busList.forEach((b,i)=>{
-        html+=`
-        <tr>
-            <td>${b.numero}</td>
-            <td>${b.type}</td>
-            <td>${b.rangees}</td>
-            <td>${b.config}</td>
-            <td>${b.capacite}</td>
-            <td><button onclick="supprimer(${i})">🗑</button></td>
-        </tr>`;
-    })
-    busTable.innerHTML = html;
+document.getElementById("listeBus").innerHTML = html;
+
 }
 
-function supprimer(i){
-    if(confirm("Supprimer ce bus ?")){
-        busList.splice(i,1);
-        afficherBus();
-    }
-}
+chargerBus();
 
-function genererSieges(bus){
-    let sieges = [];
-    let lettre = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    for(let r=0; r<bus.rangees; r++){
-        let ligne = lettre[r];
+document.getElementById("busForm").onsubmit = async (e)=>{
 
-        let nb = bus.type==="VIP" ? [2,2] : [3,2];
+e.preventDefault();
 
-        let compteur = 1;
+const data = {
+numero: numero.value,
+type: type.value,
+capacite: capacite.value
+};
 
-        nb.forEach(n=>{
-            for(let i=0;i<n;i++){
-                sieges.push({
-                    numero: ligne+compteur,
-                    reserve:false
-                });
-                compteur++;
-            }
-        });
-    }
+await fetch("http://localhost/PROJET/Back-end/api/add_bus.php",{
 
-    return sieges;
-}
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(data)
+
+});
+
+chargerBus();
+
+};
 
 </script>
 

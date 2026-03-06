@@ -95,28 +95,28 @@
         <div class="col-md-3">
           <div class="card stat-card">
             <h6>Réservations</h6>
-            <h2 id="resCount">0</h2>
+            <h2 id="totalReservations">0</h2>
           </div>
         </div>
 
         <div class="col-md-3">
           <div class="card stat-card">
             <h6>Recettes</h6>
-            <h2 id="moneyCount">0 FCFA</h2>
+            <h2 id="totalRecettes">0 FCFA</h2>
           </div>
         </div>
 
         <div class="col-md-3">
           <div class="card stat-card">
             <h6>Voyages</h6>
-            <h2 id="tripCount">0</h2>
+            <h2 id="totalVoyages">0</h2>
           </div>
         </div>
 
         <div class="col-md-3">
           <div class="card stat-card">
             <h6>Places restantes</h6>
-            <h2 id="seatCount">0</h2>
+            <h2 id="totalPlaces">0</h2>
           </div>
         </div>
 
@@ -141,17 +141,8 @@
               </tr>
             </thead>
 
-            <tbody id="reservationTable">
-              <tr>
-                <td>Gloria</td>
-                <td>Douala → Yaoundé</td>
-                <td>A1, A2</td>
-                <td><span class="badge bg-success">Payé</span></td>
-                <td><span class="badge bg-warning">En attente</span></td>
-                <td>
-                  <button class="btn btn-success btn-sm" onclick="valider(this)">Valider</button>
-                </td>
-              </tr>
+            <tbody id="listeReservations">
+              <!-- Les réservations en attente seront injectées ici via JS -->
             </tbody>
           </table>
         </div>
@@ -161,6 +152,24 @@
 
   </div>
 </div>
+
+<script>
+fetch("http://localhost/PROJET/Back-end/api/dashboard_stats.php")
+.then(res => res.json())
+.then(data => {
+  if(data.success){
+    document.getElementById("totalReservations").textContent = data.reservations;
+    document.getElementById("totalRecettes").textContent = 
+        data.recettes.toLocaleString() + " FCFA";
+    document.getElementById("totalVoyages").textContent = data.voyages;
+    document.getElementById("totalPlaces").textContent = data.places;
+  }
+});
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<canvas id="recetteChart" width="400" height="150"></canvas>
+
+</script>
 
 <script src="script.js">
     // Animation des compteurs
@@ -177,10 +186,10 @@ function animateCount(id, start, end, duration) {
   }, stepTime);
 }
 
-animateCount("resCount", 0, 128, 1200);
-animateCount("tripCount", 0, 16, 1200);
-animateCount("seatCount", 0, 230, 1200);
-animateCount("moneyCount", 0, 845000, 1200);
+animateCount("totalReservations", 0, 128, 1200);
+animateCount("totalRecettes", 0, 16, 1200);
+animateCount("totalVoyages", 0, 16, 1200);
+animateCount("totalPlaces", 0, 230, 1200);
 
 // Validation réservation
 function valider(btn) {
@@ -192,6 +201,76 @@ function valider(btn) {
   alert("Réservation validée avec succès !");
 }
 
+</script>
+
+<script>
+fetch("http://localhost/PROJET/Back-end/api/reservations_attente.php")
+.then(res => res.json())
+.then(data => {
+  if(data.success){
+
+    let html = "";
+
+    data.reservations.forEach(r => {
+      html += `
+        <tr>
+          <td>${r.ID_RESERVATION}</td>
+          <td>${r.TRAJET}</td>
+          <td>${r.SIEGES_RESERVATION}</td>
+          <td>${r.MONTANT_TOTAL.toLocaleString()} FCFA</td>
+          <td><span style="color:orange;">En attente</span></td>
+          <td>
+            <button onclick="valider(${r.ID_RESERVATION})">
+              Valider
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+
+    document.getElementById("listeReservations").innerHTML = html;
+  }
+});
+</script>
+
+<!-- script de la fonction valider -->
+<script>
+function valider(id){
+  fetch("http://localhost/PROJET/Back-end/api/valider_reservation.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id: id })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.success){
+      alert("Réservation validée !");
+      location.reload();
+    } else {
+      alert("Erreur !");
+    }
+  });
+}
+
+fetch("http://localhost/PROJET/Back-end/api/stats_mensuelles.php")
+.then(res=>res.json())
+.then(data=>{
+
+  const labels = data.map(d=>"Mois "+d.mois);
+  const totals = data.map(d=>d.total);
+
+  new Chart(document.getElementById("recetteChart"), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Recettes mensuelles",
+        data: totals
+      }]
+    }
+  });
+
+});
 </script>
 </body>
 </html>

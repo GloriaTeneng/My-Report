@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Mon Ticket - Express Voyage</title>
+
+<!-- QR CODE -->
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
 
 <style>
@@ -51,7 +53,7 @@ button{
 <body>
 
 <div class="ticket" id="ticket">
-  <h2>🎫 Ticket électronique</h2>
+  <h2>Ticket électronique</h2>
 
   <div class="line"><b>Client :</b> <span id="client"></span></div>
   <div class="line"><b>Bus :</b> <span id="bus"></span></div>
@@ -65,21 +67,39 @@ button{
 </div>
 
 <script>
-let ticket = JSON.parse(localStorage.getItem("ticket"));
+      const ticket = JSON.parse(localStorage.getItem("ticket"));
 
-if(ticket){
+  if(!ticket){
+    alert("Aucun ticket trouvé !");
+    window.location.href = "accueil.html";
+  }
+
+  // On affiche les infos
   document.getElementById("client").textContent = ticket.client;
   document.getElementById("bus").textContent = ticket.busType.toUpperCase();
   document.getElementById("seats").textContent = ticket.seats.join(", ");
   document.getElementById("total").textContent = ticket.total.toLocaleString() + " FCFA";
   document.getElementById("status").textContent = ticket.status;
 
-  new QRCode(document.getElementById("qrcode"), {
-    text: JSON.stringify(ticket),
-    width: 140,
-    height: 140
+  //  On envoie au backend pour générer le QR
+  fetch("http://localhost/PROJET/Back-end/api/generate_qr.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      reservation: ticket.id,
+      client: ticket.client,
+      voyage: ticket.voyage
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.success){
+      document.getElementById("qrcode").innerHTML =
+        `<img src="${data.qr_url}" width="140">`;
+    } else {
+      alert("Erreur QR : " + data.message);
+    }
   });
-}
 </script>
 
 </body>

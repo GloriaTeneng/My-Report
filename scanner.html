@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Scanner QR</title>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+body{
+  font-family:Arial;
+  text-align:center;
+  padding:20px;
+}
+
+#reader{
+  width:300px;
+  margin:auto;
+}
+
+#result{
+  margin-top:20px;
+  font-size:18px;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Scanner Ticket</h2>
+
+<div id="reader"></div>
+
+<div id="result"></div>
+
+<script>
+
+function onScanSuccess(decodedText) {
+
+  fetch("http://localhost/PROJET/Back-end/api/verify_ticket.php", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ qrData: decodedText })
+  })
+  .then(res=>res.json())
+  .then(data=>{
+    if(data.valid){
+      document.getElementById("result").innerHTML =
+        "<span style='color:green'>✔ Ticket valide</span>";
+    } else {
+      document.getElementById("result").innerHTML =
+        "<span style='color:red'>✖ Ticket invalide</span>";
+    }
+  });
+
+}
+
+let html5QrcodeScanner = new Html5QrcodeScanner(
+  "reader", { fps: 10, qrbox: 250 });
+
+html5QrcodeScanner.render(onScanSuccess);
+
+</script>
+
+</body>
+</html>

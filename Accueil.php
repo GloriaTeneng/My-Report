@@ -23,9 +23,52 @@
     <a class="navbar-brand fw-bold text-primary" href="#">
       <i class="bi bi-bus-front"></i> Express Voyage
     </a>
+    <div><button id="openRegister" class="btn btn-primary ms-2">Inscription</button></div>
     <div class="ms-auto">
-      <a href="#" class="btn btn-outline-primary btn-sm">Connexion</a>
+       <button id="openLogin" class="btn btn-outline-primary">Connexion</button>
+
     </div>
+    <div><a href="logout.php" class="btn btn-danger btn-sm">Déconnexion</a>
+</div>
+
+   <div id="loginModal" class="modal">
+  <div class="modal-content">
+    <span id="closeLogin">&times;</span>
+
+    <h3>Connexion</h3>
+
+    <form id="loginForm" style ="display: flex; flex-direction: column; gap: 10px;">
+      <input type="text" id="username" placeholder="Nom d'utilisateur" required><br>
+      <input type="password" id="password" placeholder="Mot de passe" required><br>
+
+      <button type="submit" style="margin-top: 10px; display: block; width: 100%; align-items: center;">Se connecter</button>
+    </form>
+
+    <div id="loginMessage"></div>
+  </div>
+</div>
+
+<!-- Modal d'inscription -->
+
+<div id="registerModal" class="modal">
+  <div class="modal-content">
+    <span id="closeRegister">&times;</span>
+
+    <h3>Inscription</h3>
+
+    <form id="registerForm" style="display:flex; flex-direction:column; gap:10px;">
+      <input type="text" id="regNom" placeholder="Nom" required>
+      <input type="text" id="regPrenom" placeholder="Prénom" required>
+      <input type="email" id="regEmail" placeholder="Email" required>
+      <input type="tel" id="regTel" placeholder="Téléphone">
+      <input type="password" id="regPass" placeholder="Mot de passe" required>
+
+      <button type="submit">Créer mon compte</button>
+    </form>
+
+    <div id="registerMessage"></div>
+  </div>
+</div>
   </div>
 </nav>
 
@@ -109,5 +152,115 @@
   <p> 2026 Express Voyage – Le plaisir de voyager</p>
 </footer>
 
+<!-- JS pour la connection -->
+ <script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const modal = document.getElementById("loginModal");
+  const openBtn = document.getElementById("openLogin");
+  const closeBtn = document.getElementById("closeLogin");
+  const loginForm = document.getElementById("loginForm");
+  const loginMessage = document.getElementById("loginMessage");
+
+  // Ouvrir modal
+  openBtn.onclick = () => modal.style.display = "block";
+
+  // Fermer modal
+  closeBtn.onclick = () => modal.style.display = "none";
+
+  // Fermer si clic extérieur
+  window.onclick = (e) => {
+    if (e.target === modal) modal.style.display = "none";
+  };
+
+  // Soumission formulaire
+  loginForm.onsubmit = async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    loginMessage.innerHTML = "Connexion...";
+
+    try {
+      const response = await fetch("http://localhost/PROJET/Back-end/api/auth.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        loginMessage.innerHTML = "<span style='color:green'>Connexion réussie</span>";
+        setTimeout(() => {
+          
+        if (data.user.role === "admin" || data.user.role === "agence") {
+  window.location.href = "admin/dashboard.html";
+}
+else if (data.user.role === "controleur") {
+  window.location.href = "controleur/scan.html";
+}
+else {
+  window.location.href = "client/index.html";
+}
+
+        }, 1000);
+      } else {
+        loginMessage.innerHTML = "<span style='color:red'>" + data.message + "</span>";
+      }
+
+    } catch (err) {
+      loginMessage.innerHTML = "<span style='color:red'>Erreur serveur</span>";
+      console.error(err);
+    }
+  };
+
+});
+</script>
+
+<!-- JS pour l'inscription -->
+<script>
+const regModal = document.getElementById("registerModal");
+const openRegister = document.getElementById("openRegister");
+const closeRegister = document.getElementById("closeRegister");
+const registerForm = document.getElementById("registerForm");
+const registerMessage = document.getElementById("registerMessage");
+
+openRegister.onclick = () => regModal.style.display = "block";
+closeRegister.onclick = () => regModal.style.display = "none";
+
+registerForm.onsubmit = async (e) => {
+  e.preventDefault();
+
+  const data = {
+    nom: regNom.value,
+    prenom: regPrenom.value,
+    email: regEmail.value,
+    telephone: regTel.value,
+    password: regPass.value
+  };
+
+  registerMessage.innerHTML = "Création du compte...";
+
+  const res = await fetch("http://localhost/PROJET/Back-end/api/register.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+  const modal = document.getElementById("loginModal");
+  const json = await res.json();
+
+  if (json.success) {
+    registerMessage.innerHTML = "<span style='color:green'>Compte créé ! Connectez-vous.</span>";
+    setTimeout(()=>{
+      regModal.style.display="none";
+      modal.style.display="block";
+    },1200);
+  } else {
+    registerMessage.innerHTML = "<span style='color:red'>" + json.message + "</span>";
+  }
+};
+</script>
 </body>
 </html>
