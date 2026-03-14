@@ -25,7 +25,7 @@
     </a>
     <div><button id="openRegister" class="btn btn-primary ms-2">Inscription</button></div>
     <div class="ms-auto">
-       <button id="openLogin" class="btn btn-outline-primary">Connexion</button>
+       <button id="openLogin" class="btn btn-outline-primary btn-login">Connexion</button>
 
     </div>
     <div><a href="logout.php" class="btn btn-danger btn-sm">Déconnexion</a>
@@ -51,19 +51,20 @@
 <!-- Modal d'inscription -->
 
 <div id="registerModal" class="modal">
-  <div class="modal-content">
+  <div style="width: 40%; justify-content: center;" class="modal-content">
     <span id="closeRegister">&times;</span>
 
     <h3>Inscription</h3>
 
-    <form id="registerForm" style="display:flex; flex-direction:column; gap:10px;">
-      <input type="text" id="regNom" placeholder="Nom" required>
-      <input type="text" id="regPrenom" placeholder="Prénom" required>
-      <input type="email" id="regEmail" placeholder="Email" required>
-      <input type="tel" id="regTel" placeholder="Téléphone">
-      <input type="password" id="regPass" placeholder="Mot de passe" required>
+    <form id="registerForm" style="display:flex; flex-direction:column; gap:10px; width: 90%; align-self: center;">
+      <input class="form-control" type="text" id="regNom" placeholder="Nom" required>
+      <input class="form-control" type="text" id="regPrenom" placeholder="Prénom" required>
+      <input class="form-control" type="email" id="regEmail" placeholder="Email" required>
+      <input class="form-control" type="tel" id="regTel" placeholder="Téléphone">
+      <input class="form-control" type="password" id="regPass" placeholder="Mot de passe" required>
 
-      <button type="submit">Créer mon compte</button>
+      <button style="background-color: rgb(10, 249, 10); justify-self: center; width: 110px; float: right;" type="submit">Créer mon compte</button>
+      <button type="button" id="closeRegisterBtn" class="btn btn-outline-secondary">Fermer</button>
     </form>
 
     <div id="registerMessage"></div>
@@ -88,7 +89,7 @@
             <div class="row g-3">
               <div class="col-md-4">
                 <label class="form-label">Départ</label>
-                   <select class="form-select">
+                   <select class="form-select" name="depart" id="departSelect">
                       <option>Yaoundé</option>
                       <option>Bafoussam</option>
                       <option>Douala</option>
@@ -98,7 +99,7 @@
 
               <div class="col-md-4">
                 <label class="form-label">Destination</label>
-                <select class="form-select">
+                <select class="form-select" name="destination" id="destinationSelect">
                       <option>Yaoundé</option>
                       <option>Bafoussam</option>
                       <option>Douala</option>
@@ -108,7 +109,7 @@
 
               <div class="col-md-4">
                 <label class="form-label">Date</label>
-                <input type="date" class="form-control">
+                <input type="date" class="form-control" name="date" id="dateSelect">
               </div>
             </div>
 
@@ -193,9 +194,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (data.success) {
         loginMessage.innerHTML = "<span style='color:green'>Connexion réussie</span>";
-        setTimeout(() => {
-          
-        if (data.user.role === "admin" || data.user.role === "agence") {
+        setTimeout(() => {       
+      // Stocker l'utilisateur pour la reservation
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      if (data.user.role === "admin" || data.user.role === "agence") {
   window.location.href = "admin/dashboard.html";
 }
 else if (data.user.role === "controleur") {
@@ -224,11 +227,15 @@ else {
 const regModal = document.getElementById("registerModal");
 const openRegister = document.getElementById("openRegister");
 const closeRegister = document.getElementById("closeRegister");
+const closeRegisterBtn = document.getElementById("closeRegisterBtn");
 const registerForm = document.getElementById("registerForm");
 const registerMessage = document.getElementById("registerMessage");
 
 openRegister.onclick = () => regModal.style.display = "block";
 closeRegister.onclick = () => regModal.style.display = "none";
+if (closeRegisterBtn) {
+  closeRegisterBtn.onclick = () => regModal.style.display = "none";
+}
 
 registerForm.onsubmit = async (e) => {
   e.preventDefault();
@@ -264,3 +271,5 @@ registerForm.onsubmit = async (e) => {
 </script>
 </body>
 </html>
+
+

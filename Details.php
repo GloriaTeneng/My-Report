@@ -2,11 +2,10 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Détails du voyage - Express Voyage</title>
+  <title>Details du voyage - Express Voyage</title>
   <link rel="stylesheet" href="assets/css/style.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 </head>
 <body>
@@ -14,7 +13,7 @@
   <div class="container mt-5 mb-5">
 
   <h4 class="text-primary mb-4">
-    <i class="bi bi-bus-front"></i> Détails du voyage
+    <i class="bi bi-bus-front"></i> Details du voyage
     <small class="text-muted">(Trip details)</small>
   </h4>
 
@@ -26,11 +25,11 @@
       <div class="row">
         <div class="col-md-6 info-box">
           <i class="bi bi-geo-alt-fill text-primary"></i>
-          <strong>Départ :</strong> Douala
+          <strong>Depart :</strong> <span id="detailDepart">-</span>
         </div>
         <div class="col-md-6 info-box">
           <i class="bi bi-flag-fill text-danger"></i>
-          <strong>Destination :</strong> Yaoundé
+          <strong>Destination :</strong> <span id="detailDestination">-</span>
         </div>
       </div>
 
@@ -39,11 +38,11 @@
       <div class="row">
         <div class="col-md-6 info-box">
           <i class="bi bi-calendar-event"></i>
-          <strong>Date :</strong> 20 Juin 2025
+          <strong>Date :</strong> <span id="detailDate">-</span>
         </div>
         <div class="col-md-6 info-box">
           <i class="bi bi-clock"></i>
-          <strong>Heure :</strong> 08h00
+          <strong>Heure :</strong> <span id="detailHeure">-</span>
         </div>
       </div>
 
@@ -52,20 +51,20 @@
       <div class="row">
         <div class="col-md-6 info-box">
           <strong>Type :</strong>
-          <span class="badge badge-vip text-white">VIP</span>
+          <span id="detailType" class="badge badge-vip text-white">-</span>
         </div>
         <div class="col-md-6 info-box">
           <strong>Prix :</strong>
-          <div class="price">6 000 FCFA</div>
+          <div id="detailPrix" class="price">-</div>
         </div>
       </div>
 
       <!-- Conditions -->
       <div class="section-title mt-4">Conditions</div>
       <ul class="list-group list-group-flush">
-        <li class="list-group-item">🕒 Arriver 30 minutes avant</li>
-        <li class="list-group-item">🪪 Pièce d’identité obligatoire</li>
-        <li class="list-group-item">🎒 Bagages selon réglementation</li>
+        <li class="list-group-item">Arriver 30 minutes avant</li>
+        <li class="list-group-item">Piece d'identite obligatoire</li>
+        <li class="list-group-item">Bagages selon reglementation</li>
       </ul>
 
       <!-- Actions -->
@@ -73,14 +72,73 @@
         <a href="resultats.php" class="btn btn-outline-secondary">
           <i class="bi bi-arrow-left"></i> Retour
         </a>
-        <a href="sieges.php" class="btn btn-primary">
-          Choisir un siège
+        <a href="sieges.php" id="btnSieges" class="btn btn-primary">
+          Choisir un siege
         </a>
       </div>
 
     </div>
   </div>
 </div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const voyageId = params.get("id");
+
+  const depEl = document.getElementById("detailDepart");
+  const destEl = document.getElementById("detailDestination");
+  const dateEl = document.getElementById("detailDate");
+  const heureEl = document.getElementById("detailHeure");
+  const typeEl = document.getElementById("detailType");
+  const prixEl = document.getElementById("detailPrix");
+  const btnSieges = document.getElementById("btnSieges");
+
+  async function chargerDetails() {
+    if (!voyageId) {
+      btnSieges.setAttribute("disabled", true);
+      btnSieges.classList.add("disabled");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost/PROJET/Back-end/api/get_voyages.php");
+      const voyages = await res.json();
+      const v = Array.isArray(voyages) ? voyages.find(x => String(x.ID_VOYAGE) === String(voyageId)) : null;
+
+      if (!v) {
+        btnSieges.setAttribute("disabled", true);
+        btnSieges.classList.add("disabled");
+        return;
+      }
+
+      depEl.textContent = v.VILLE_DEPART || "-";
+      destEl.textContent = v.VILLE_ARRIVE || "-";
+      dateEl.textContent = v.DATEDEPART || "-";
+      heureEl.textContent = v.HEUREDEPART || "-";
+      typeEl.textContent = v.CATEGORIE || "CLASSIQUE";
+      prixEl.textContent = Number(v.COUT || 0).toLocaleString("fr-FR") + " FCFA";
+
+      const selectedVoyage = {
+        id: v.ID_VOYAGE,
+        depart: v.VILLE_DEPART,
+        destination: v.VILLE_ARRIVE,
+        date: v.DATEDEPART,
+        heure: v.HEUREDEPART,
+        categorie: v.CATEGORIE,
+        prix: v.COUT
+      };
+      localStorage.setItem("selectedVoyage", JSON.stringify(selectedVoyage));
+
+      btnSieges.href = "sieges.php?id=" + encodeURIComponent(v.ID_VOYAGE);
+    } catch (e) {
+      btnSieges.setAttribute("disabled", true);
+      btnSieges.classList.add("disabled");
+      console.error(e);
+    }
+  }
+
+  chargerDetails();
+</script>
 
 </body>
 </html>

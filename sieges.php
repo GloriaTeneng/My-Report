@@ -314,10 +314,10 @@
       <p>Prix total : <strong id="totalPrice">0 FCFA</strong></p>
 
       <div class="d-flex justify-content-end">
-        <a href="paiement.php" class="btn btn-primary" id="continueBtn" disabled>
+        <button type="button" class="btn btn-primary" id="continueBtn" disabled>
              Continuer vers paiement
-        </a>
-</div>
+        </button>
+      </div>
 
       
     </div>
@@ -326,7 +326,10 @@
 </div>
 
 <script>
-  // ====== Récupération des éléments ======
+  const params = new URLSearchParams(window.location.search);
+  const voyageId = params.get("id");
+
+  //  Recuperation des elements 
   const allSeats = document.querySelectorAll('.seat');
   const messageBox = document.getElementById('message');
   const selectedSeatText = document.getElementById('selectedSeat');
@@ -334,7 +337,7 @@
   const totalPriceText = document.getElementById('totalPrice');
   const busTypeText = document.getElementById('busType');
 
-  // ====== Prix ======
+  // Prix
   const PRICES = {
     vip: 10000,
     classique: 5000
@@ -342,11 +345,67 @@
 
   let selectedSeats = [];
   let selectedBusType = null;
+  let allowedBusType = null;
+  let selectedVoyage = null;
 
-  // ====== Simulation base de données (statut sièges) ======
+  try {
+    selectedVoyage = JSON.parse(localStorage.getItem("selectedVoyage"));
+  } catch (e) {
+    selectedVoyage = null;
+  }
+
+  if (selectedVoyage && voyageId && String(selectedVoyage.id) !== String(voyageId)) {
+    selectedVoyage = null;
+  }
+// bloquer en fonction de la categorie
+  function applyCategoryLock() {
+    if (!allowedBusType) return;
+
+    allSeats.forEach(seat => {
+      const busType = seat.dataset.bus;
+      if (busType !== allowedBusType) {
+        seat.classList.add("locked");
+      }
+    });
+  }
+
+  async function ensureVoyage() {
+    if (!voyageId || selectedVoyage) return;
+
+    try {
+      const res = await fetch("http://localhost/PROJET/Back-end/api/get_voyages.php");
+      const voyages = await res.json();
+      const v = Array.isArray(voyages) ? voyages.find(x => String(x.ID_VOYAGE) === String(voyageId)) : null;
+      if (!v) return;
+
+      selectedVoyage = {
+        id: v.ID_VOYAGE,
+        depart: v.VILLE_DEPART,
+        destination: v.VILLE_ARRIVE,
+        date: v.DATEDEPART,
+        heure: v.HEUREDEPART,
+        categorie: v.CATEGORIE,
+        prix: v.COUT
+      };
+      localStorage.setItem("selectedVoyage", JSON.stringify(selectedVoyage));
+      allowedBusType = (v.CATEGORIE || "").toLowerCase() === "vip" ? "vip" : "classique";
+      applyCategoryLock();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  ensureVoyage();
+
+  if (selectedVoyage && selectedVoyage.categorie) {
+    allowedBusType = (selectedVoyage.categorie || "").toLowerCase() === "vip" ? "vip" : "classique";
+    applyCategoryLock();
+  }
+
+  //  Simulation base de donnees (statut sieges) 
   let seatStatus = JSON.parse(localStorage.getItem("seatStatus")) || {};
 
-  // ====== Appliquer les statuts enregistrés ======
+  // Appliquer les statuts enregistres 
   allSeats.forEach(seat => {
     const num = seat.textContent;
 
@@ -358,50 +417,60 @@
     }
   });
 
-  // ====== Message ======
+  //  Message 
   function showMessage(text) {
     messageBox.textContent = text;
     messageBox.classList.remove('d-none');
     setTimeout(() => messageBox.classList.add('d-none'), 3000);
   }
 
-  // ====== Mise à jour du résumé ======
+  //  Mise a jour du resume 
   function updateSummary() {
     if (selectedSeats.length === 0) {
       selectedSeatText.textContent = "Aucun";
-      busTypeText.textContent = "—";
+      busTypeText.textContent = "-";
       totalPriceText.textContent = "0 FCFA";
-      continueBtn.setAttribute('disabled', true);
+      continueBtn.disabled = true;
       return;
     }
 
-    const price = PRICES[selectedBusType] * selectedSeats.length;
+    const unitPrice = (selectedVoyage && selectedVoyage.prix) ? Number(selectedVoyage.prix) : PRICES[selectedBusType];
+    const price = unitPrice * selectedSeats.length;
     selectedSeatText.textContent = selectedSeats.join(', ');
     busTypeText.textContent = selectedBusType.toUpperCase();
     totalPriceText.textContent = price.toLocaleString() + " FCFA";
-    continueBtn.removeAttribute('disabled');
+    continueBtn.disabled = false;
   }
 
-  // ====== Sélection des sièges ======
+  // Selection des sieges 
   allSeats.forEach(seat => {
     seat.addEventListener('click', () => {
 
-      // Si déjà réservé
+      // Si deja reserve ou verrouille
       if (seat.classList.contains('reserved') || seat.classList.contains('pending')) {
-        showMessage("Ce siège est déjà réservé ou en attente de validation.");
+        showMessage("Ce siege est deja reserve ou en attente de validation.");
+        return;
+      }
+      if (seat.classList.contains('locked')) {
+        showMessage("Ce siege ne correspond pas a la categorie du voyage.");
         return;
       }
 
       const seatNumber = seat.textContent;
       const busType = seat.dataset.bus;
 
-      // Empêcher mélange VIP / Classique
-      if (selectedBusType && busType !== selectedBusType) {
-        showMessage("Veuillez choisir des sièges du même type de bus.");
+      if (allowedBusType && busType !== allowedBusType) {
+        showMessage("Veuillez choisir des sieges du type " + allowedBusType.toUpperCase() + ".");
         return;
       }
 
-      // Désélection
+      // Empecher melange VIP / Classique
+      if (selectedBusType && busType !== selectedBusType) {
+        showMessage("Veuillez choisir des sieges du meme type de bus.");
+        return;
+      }
+
+      // Deselection
       if (seat.classList.contains('selected')) {
         seat.classList.remove('selected');
         selectedSeats = selectedSeats.filter(s => s !== seatNumber);
@@ -410,7 +479,7 @@
           selectedBusType = null;
         }
       }
-      // Sélection
+      // Selection
       else {
         seat.classList.add('selected');
         selectedSeats.push(seatNumber);
@@ -421,23 +490,41 @@
     });
   });
 
-  // ====== Validation réservation client ======
-  continueBtn.addEventListener('click', () => {
+  // Validation reservation client 
+  continueBtn.addEventListener('click', (e) => {
+    e.preventDefault();
     if (selectedSeats.length === 0) return;
+    if (!voyageId && !(selectedVoyage && selectedVoyage.id)) {
+      showMessage("Voyage introuvable. Veuillez revenir aux résultats.");
+      return;
+    }
+
+    const unitPrice = (selectedVoyage && selectedVoyage.prix) ? Number(selectedVoyage.prix) : PRICES[selectedBusType];
+    const total = unitPrice * selectedSeats.length;
+
+    const draft = {
+      voyageId: (selectedVoyage && selectedVoyage.id) ? selectedVoyage.id : voyageId,
+      seats: selectedSeats,
+      busType: selectedBusType,
+      unitPrice: unitPrice,
+      total: total,
+      dateVoyage: selectedVoyage ? selectedVoyage.date : null,
+      depart: selectedVoyage ? selectedVoyage.depart : null,
+      destination: selectedVoyage ? selectedVoyage.destination : null,
+      heure: selectedVoyage ? selectedVoyage.heure : null
+    };
+
+    localStorage.setItem("reservationDraft", JSON.stringify(draft));
 
     selectedSeats.forEach(seat => {
       seatStatus[seat] = "pending";
     });
-
     localStorage.setItem("seatStatus", JSON.stringify(seatStatus));
 
-    showMessage("Réservation envoyée. En attente de validation par l'agence.");
-
-    setTimeout(() => {
-      location.reload();
-    }, 1500);
+    window.location.href = "paiement.php?id=" + encodeURIComponent(draft.voyageId || "");
   });
 </script>
 
 </body>
 </html>
+

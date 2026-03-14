@@ -26,10 +26,16 @@
 </div>
 
 <script>
-
 async function chargerVoyages(){
 
 const container = document.getElementById("voyagesContainer");
+const params = new URLSearchParams(window.location.search);
+const criteria = {
+  depart: params.get("depart"),
+  destination: params.get("destination"),
+  date: params.get("date")
+};
+const hasCriteria = Boolean(criteria.depart || criteria.destination || criteria.date);
 
 try{
 
@@ -38,10 +44,28 @@ const voyages = await res.json();
 
 container.innerHTML = "";
 
-voyages.forEach(v => {
+const normalize = (value) => (value || "").toString().trim().toLowerCase();
 
-let type = v.PRIX_VIP ? "VIP" : "Classique";
-let prix = v.PRIX_VIP ? v.PRIX_VIP : v.PRIX_CLASSIQUE;
+let filtered = voyages;
+if (hasCriteria) {
+  filtered = voyages.filter((v) => {
+    const depOk = !criteria.depart || normalize(v.VILLE_DEPART) === normalize(criteria.depart);
+    const destOk = !criteria.destination || normalize(v.VILLE_ARRIVE) === normalize(criteria.destination);
+    const dateOk = !criteria.date || String(v.DATEDEPART || "").startsWith(criteria.date);
+    return depOk && destOk && dateOk;
+  });
+  localStorage.setItem("searchCriteria", JSON.stringify(criteria));
+}
+
+if (!Array.isArray(filtered) || filtered.length === 0) {
+  container.innerHTML = "<p class='text-muted'>Aucun voyage ne correspond Ã  votre recherche.</p>";
+  return;
+}
+
+filtered.forEach(v => {
+
+let type = v.CATEGORIE ? (v.CATEGORIE === "CLASSIQUE" ? "Classique" : v.CATEGORIE) : "Classique";
+let prix = v.COUT ? v.COUT : 0;
 
 let badgeType = type === "VIP" ? "bg-primary" : "bg-secondary";
 
@@ -60,7 +84,7 @@ let carte = `
 <div class="row align-items-center">
 
 <div class="col-md-4">
-<h6 class="mb-1">Trajet ${v.ID_TRAJET}</h6>
+<h6 class="mb-1">Trajet ${v.VILLE_DEPART ? (v.VILLE_DEPART + " - " + (v.VILLE_ARRIVE || "")) : v.ID_TRAJET}</h6>
 
 <small class="text-muted">
 <i class="bi bi-calendar"></i> ${v.DATEDEPART}
@@ -73,7 +97,7 @@ let carte = `
 </div>
 
 <div class="col-md-2 text-center">
-<strong>${prix} FCFA</strong>
+<strong>${Number(prix || 0).toLocaleString("fr-FR")} FCFA</strong>
 </div>
 
 <div class="col-md-2 text-center">

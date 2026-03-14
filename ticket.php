@@ -56,6 +56,7 @@ button{
   <h2>Ticket électronique</h2>
 
   <div class="line"><b>Client :</b> <span id="client"></span></div>
+  <div class="line"><b>Téléphone :</b> <span id="phone"></span></div>
   <div class="line"><b>Bus :</b> <span id="bus"></span></div>
   <div class="line"><b>Sièges :</b> <span id="seats"></span></div>
   <div class="line"><b>Montant :</b> <span id="total"></span></div>
@@ -76,6 +77,7 @@ button{
 
   // On affiche les infos
   document.getElementById("client").textContent = ticket.client;
+  document.getElementById("phone").textContent = ticket.telephone || "-";
   document.getElementById("bus").textContent = ticket.busType.toUpperCase();
   document.getElementById("seats").textContent = ticket.seats.join(", ");
   document.getElementById("total").textContent = ticket.total.toLocaleString() + " FCFA";
