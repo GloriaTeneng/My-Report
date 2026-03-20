@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Express Voyage - Réservation de tickets</title>
+  <title>Express Voyage - RÃ©servation de tickets</title>
 
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -28,7 +28,7 @@
        <button id="openLogin" class="btn btn-outline-primary btn-login">Connexion</button>
 
     </div>
-    <div><a href="logout.php" class="btn btn-danger btn-sm">Déconnexion</a>
+    <div><a href="logout.php" class="btn btn-danger btn-sm">DÃ©connexion</a>
 </div>
 
    <div id="loginModal" class="modal">
@@ -58,12 +58,12 @@
 
     <form id="registerForm" style="display:flex; flex-direction:column; gap:10px; width: 90%; align-self: center;">
       <input class="form-control" type="text" id="regNom" placeholder="Nom" required>
-      <input class="form-control" type="text" id="regPrenom" placeholder="Prénom" required>
+      <input class="form-control" type="text" id="regPrenom" placeholder="PrÃ©nom" required>
       <input class="form-control" type="email" id="regEmail" placeholder="Email" required>
-      <input class="form-control" type="tel" id="regTel" placeholder="Téléphone">
+      <input class="form-control" type="tel" id="regTel" placeholder="TÃ©lÃ©phone">
       <input class="form-control" type="password" id="regPass" placeholder="Mot de passe" required>
 
-      <button style="background-color: rgb(10, 249, 10); justify-self: center; width: 110px; float: right;" type="submit">Créer mon compte</button>
+      <button style="background-color: rgb(10, 249, 10); justify-self: center; width: 110px; float: right;" type="submit">CrÃ©er mon compte</button>
       <button type="button" id="closeRegisterBtn" class="btn btn-outline-secondary">Fermer</button>
     </form>
 
@@ -81,16 +81,16 @@
 
         <div class="search-card shadow">
           <h4 class="mb-3 text-center">
-            Réservez votre voyage en toute simplicité
+            Reservez votre voyage en toute simplicite
           </h4>
 
           <form action="resultats.php" method="get">
 
             <div class="row g-3">
               <div class="col-md-4">
-                <label class="form-label">Départ</label>
+                <label class="form-label">Depart</label>
                    <select class="form-select" name="depart" id="departSelect">
-                      <option>Yaoundé</option>
+                      <option>Yaounde</option>
                       <option>Bafoussam</option>
                       <option>Douala</option>
                    </select>
@@ -100,11 +100,11 @@
               <div class="col-md-4">
                 <label class="form-label">Destination</label>
                 <select class="form-select" name="destination" id="destinationSelect">
-                      <option>Yaoundé</option>
+                      <option>Yaounde</option>
                       <option>Bafoussam</option>
                       <option>Douala</option>
                    </select>
-                <!-- <input type="text" class="form-control" placeholder="Ex : Yaoundé"> -->
+                <!-- <input type="text" class="form-control" placeholder="Ex : Yaounde"> -->
               </div>
 
               <div class="col-md-4">
@@ -133,11 +133,11 @@
     <div class="col-md-4">
       <i class="bi bi-clock-history icon"></i>
       <h6>Rapide</h6>
-      <p>Réservation en quelques clics</p>
+      <p>RÃ©servation en quelques clics</p>
     </div>
     <div class="col-md-4">
       <i class="bi bi-shield-check icon"></i>
-      <h6>Sécurisé</h6>
+      <h6>SÃ©curisÃ©</h6>
       <p>Paiement et ticket fiables</p>
     </div>
     <div class="col-md-4">
@@ -150,7 +150,7 @@
 
 <!-- FOOTER -->
 <footer class="footer mt-5">
-  <p> 2026 Express Voyage – Le plaisir de voyager</p>
+  <p> 2026 Express Voyage â€“ Le plaisir de voyager</p>
 </footer>
 
 <!-- JS pour la connection -->
@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Fermer modal
   closeBtn.onclick = () => modal.style.display = "none";
 
-  // Fermer si clic extérieur
+  // Fermer si clic extÃ©rieur
   window.onclick = (e) => {
     if (e.target === modal) modal.style.display = "none";
   };
@@ -193,22 +193,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
 
       if (data.success) {
-        loginMessage.innerHTML = "<span style='color:green'>Connexion réussie</span>";
-        setTimeout(() => {       
-      // Stocker l'utilisateur pour la reservation
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      if (data.user.role === "admin" || data.user.role === "agence") {
-  window.location.href = "admin/dashboard.html";
-}
-else if (data.user.role === "controleur") {
-  window.location.href = "controleur/scan.html";
-}
-else {
-  window.location.href = "client/index.html";
-}
-
-        }, 1000);
+        loginMessage.innerHTML = "<span style='color:green'>Connexion reussie</span>";
+        setTimeout(() => {
+          // Stocker l'utilisateur pour la reservation
+          localStorage.setItem("user", JSON.stringify(data.user));
+          modal.style.display = "none";
+          loginMessage.innerHTML = "";
+        }, 600);
       } else {
         loginMessage.innerHTML = "<span style='color:red'>" + data.message + "</span>";
       }
@@ -248,7 +239,7 @@ registerForm.onsubmit = async (e) => {
     password: regPass.value
   };
 
-  registerMessage.innerHTML = "Création du compte...";
+  registerMessage.innerHTML = "Creation du compte...";
 
   const res = await fetch("http://localhost/PROJET/Back-end/api/register.php", {
     method: "POST",
@@ -259,7 +250,7 @@ registerForm.onsubmit = async (e) => {
   const json = await res.json();
 
   if (json.success) {
-    registerMessage.innerHTML = "<span style='color:green'>Compte créé ! Connectez-vous.</span>";
+    registerMessage.innerHTML = "<span style='color:green'>Compte cree ! Connectez-vous.</span>";
     setTimeout(()=>{
       regModal.style.display="none";
       modal.style.display="block";
@@ -271,5 +262,8 @@ registerForm.onsubmit = async (e) => {
 </script>
 </body>
 </html>
+
+
+
 
 

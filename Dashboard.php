@@ -40,13 +40,17 @@
       </div>
 
       <div class="card mt-4">
-        <div class="card-header bg-primary text-white">Reservations en attente</div>
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <span>Reservations en attente</span>
+          <button class="btn btn-sm btn-light" type="button" onclick="resetAllSeats()">Reinitialiser tous les sieges</button>
+        </div>
         <div class="table-responsive">
           <table class="table table-hover align-middle mb-0">
             <thead class="table-light">
               <tr>
                 <th>ID</th>
                 <th>Trajet</th>
+                <th>Point depart</th>
                 <th>Sieges</th>
                 <th>Paiement</th>
                 <th>Statut</th>
@@ -106,6 +110,7 @@ async function chargerReservationsAttente() {
       <tr>
         <td>${r.ID_RESERVATION}</td>
         <td>${r.TRAJET ?? "-"}</td>
+        <td>${r.POINT_DEPART ?? "-"}</td>
         <td>${r.SIEGES_RESERVATION ?? "-"}</td>
         <td>${formatFCFA(r.MONTANT_TOTAL)}</td>
         <td><span class="badge bg-warning text-dark">En attente</span></td>
@@ -115,7 +120,7 @@ async function chargerReservationsAttente() {
     }).join("");
 
     document.getElementById("listeReservations").innerHTML = rows || `
-      <tr><td colspan="6" class="text-center py-3">Aucune reservation en attente.</td></tr>
+      <tr><td colspan="7" class="text-center py-3">Aucune reservation en attente.</td></tr>
     `;
   } catch (error) {
     console.error("Erreur reservations en attente:", error);
@@ -160,7 +165,7 @@ async function chargerRecettesMensuelles() {
         datasets: [{
           label: "Recettes mensuelles (FCFA)",
         data: totals,
-        backgroundColor: "#0d6efd"
+        backgroundColor: "#1ba84b"
         }]
      },
       options: {
@@ -170,7 +175,25 @@ async function chargerRecettesMensuelles() {
     });
   } catch (error) {
     console.error("Erreur stats mensuelles:", error);
+  }
 }
+
+async function resetAllSeats() {
+  if (!confirm("Reinitialiser tous les sieges ?")) return;
+  try {
+    const res = await fetch(API_BASE + "/reset_seats.php", { method: "POST" });
+    const data = await res.json();
+    if (data.success) {
+      localStorage.removeItem("seatStatus");
+      alert("Sieges reinitialises.");
+      await Promise.all([chargerStatsDashboard(), chargerReservationsAttente()]);
+      return;
+    }
+    alert(data.message || "Echec de la reinitialisation.");
+  } catch (error) {
+    console.error("Erreur reinitialisation:", error);
+    alert("Erreur serveur.");
+  }
 }
 
 chargerStatsDashboard();
@@ -179,3 +202,4 @@ chargerRecettesMensuelles();
 </script>
 </body>
 </html>
+

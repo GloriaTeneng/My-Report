@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Résultats - Express Voyage</title>
+<title>Resultats - Express Voyage</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
@@ -20,7 +20,7 @@
 <i class="bi bi-search"></i> Voyages disponibles
 </h4>
 
-<!-- LES VOYAGES SERONT AJOUTÉS ICI -->
+<!-- LES VOYAGES SERONT AJOUTES ICI -->
 <div id="voyagesContainer"></div>
 
 </div>
@@ -44,7 +44,7 @@ const voyages = await res.json();
 
 container.innerHTML = "";
 
-const normalize = (value) => (value || "").toString().trim().toLowerCase();
+const normalize = (value) => (value || "").toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
 let filtered = voyages;
 if (hasCriteria) {
@@ -58,7 +58,7 @@ if (hasCriteria) {
 }
 
 if (!Array.isArray(filtered) || filtered.length === 0) {
-  container.innerHTML = "<p class='text-muted'>Aucun voyage ne correspond Ã  votre recherche.</p>";
+  container.innerHTML = "<p class='text-muted'>Aucun voyage ne correspond a votre recherche.</p>";
   return;
 }
 
@@ -74,7 +74,7 @@ let statutBadge = v.STATUT_VOYAGE === "disponible"
 : '<span class="badge bg-danger">Complet</span>';
 
 let bouton = v.STATUT_VOYAGE === "disponible"
-? `<a href="details.php?id=${v.ID_VOYAGE}" class="btn btn-outline-primary btn-sm">Voir détails</a>`
+? `<a href="details.php?id=${v.ID_VOYAGE}" class="btn btn-outline-primary btn-sm">Voir details</a>`
 : `<button class="btn btn-outline-secondary btn-sm" disabled>Indisponible</button>`;
 
 let carte = `
@@ -133,3 +133,4 @@ chargerVoyages();
 </script>
 </body>
 </html>
+

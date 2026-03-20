@@ -3,6 +3,18 @@ body {
   background-color: #f5f7fa;
 }
 
+:root {
+  --brand-green: #1ba84b;
+  --brand-green-dark: #117a36;
+  --brand-blue: #1d4ed8;
+  --brand-red: #e11d2a;
+
+  --bs-primary: var(--brand-green);
+  --bs-primary-rgb: 27, 168, 75;
+  --bs-link-color: var(--brand-green);
+  --bs-link-hover-color: var(--brand-green-dark);
+}
+
 .modal {
   display: none;
   position: fixed;
@@ -45,7 +57,7 @@ body {
 }
 
 #loginForm button[type="submit"] {
-  background: #0d6efd;
+  background: var(--brand-green);
   color: #ffffff;
   border: none;
   padding: 10px 14px;
@@ -76,12 +88,12 @@ body {
 
 .icon {
   font-size: 2.5rem;
-  color: #0d6efd;
+  color: var(--brand-green);
   margin-bottom: 10px;
 }
 
 .footer {
-  background-color: #0d6efd;
+  background-color: var(--brand-green);
   color: white;
   text-align: center;
   padding: 15px;
@@ -103,6 +115,6 @@ body {
 }
 
 .btn-login:hover {
-  background-color: #0d6efd;
+  background-color: var(--brand-green);
   color: #ffffff;
 }

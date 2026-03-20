@@ -1,13 +1,22 @@
 :root {
-  --bleu: #0d6efd;     /* bleu Express */
-  --rouge: #b02a37;    /* rouge sobre */
+  --brand-green: #1ba84b;
+  --brand-green-dark: #117a36;
+  --brand-blue: #1d4ed8;
+  --brand-red: #e11d2a;
   --gris: #f8f9fa;
+
+  --bs-primary: var(--brand-green);
+  --bs-primary-rgb: 27, 168, 75;
+  --bs-link-color: var(--brand-green);
+  --bs-link-hover-color: var(--brand-green-dark);
 }
 .btn-primary {
-  background-color: var(--bleu);
+  background-color: var(--brand-green);
+  border-color: var(--brand-green);
 }
 .btn-danger {
-  background-color: var(--rouge);
+  background-color: var(--brand-red);
+  border-color: var(--brand-red);
 }
 
 body {
@@ -37,9 +46,9 @@ body {
 .price {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #0d6efd;
+  color: var(--brand-green);
 }
 
 .badge-vip {
-  background-color: #8b0000;
+  background-color: var(--brand-blue);
 }

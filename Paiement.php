@@ -34,6 +34,7 @@
           <hr>
 
           <p><strong>Trajet :</strong> <span id="recapTrajet">-</span></p>
+          <p><strong>Point de depart :</strong> <span id="recapPointDepart">-</span></p>
           <p><strong>Date :</strong> <span id="recapDate">-</span></p>
           <p><strong>Heure :</strong> <span id="recapHeure">-</span></p>
           <p><strong>Bus :</strong> <span id="recapBus">-</span></p>
@@ -73,12 +74,6 @@
               </label>
             </div>
 
-            <!-- INFO -->
-            <div class="alert alert-info">
-              <i class="bi bi-info-circle"></i>
-              Le paiement est simule dans le cadre academique du projet.
-            </div>
-
             <div class="d-grid mt-4">
               <button type="submit" class="btn btn-primary btn-lg">
                 Payer et confirmer la reservation
@@ -100,6 +95,7 @@
   const user = JSON.parse(localStorage.getItem("user") || "null");
 
   const trajetEl = document.getElementById("recapTrajet");
+  const pointDepartEl = document.getElementById("recapPointDepart");
   const dateEl = document.getElementById("recapDate");
   const heureEl = document.getElementById("recapHeure");
   const busEl = document.getElementById("recapBus");
@@ -119,6 +115,7 @@
 
   if (draft) {
     trajetEl.textContent = (draft.depart && draft.destination) ? (draft.depart + " -> " + draft.destination) : "-";
+    pointDepartEl.textContent = draft.pointDepart || "-";
     dateEl.textContent = draft.dateVoyage || "-";
     heureEl.textContent = draft.heure || "-";
     busEl.textContent = draft.busType ? draft.busType.toUpperCase() : "-";
@@ -135,6 +132,7 @@
       id_voyage: draft.voyageId,
       numcni_client: user.id,
       sieges: Array.isArray(draft.seats) ? draft.seats.join(",") : "",
+      point_depart: draft.pointDepart || "",
       montant_total: draft.total,
       date: new Date().toISOString().split("T")[0]
     };
@@ -160,6 +158,7 @@
         client: clientName || user.id,
         telephone: user.telephone || "",
         busType: draft.busType || "classique",
+        pointDepart: draft.pointDepart || "",
         seats: draft.seats || [],
         total: draft.total || 0,
         status: "EN ATTENTE",

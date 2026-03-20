@@ -42,6 +42,7 @@
                 <th>ID reservation</th>
                 <th>ID voyage</th>
                 <th>Trajet</th>
+                <th>Point depart</th>
                 <th>Sieges</th>
                 <th>Montant</th>
                 <th>Statut</th>
@@ -70,7 +71,7 @@ async function chargerReservations() {
     const tbody = document.getElementById("listeReservations");
 
     if (!data.success || !Array.isArray(data.reservations) || data.reservations.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" class="text-center py-3">Aucune reservation en attente.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center py-3">Aucune reservation en attente.</td></tr>';
       return;
     }
 
@@ -81,6 +82,7 @@ async function chargerReservations() {
         <td>${r.ID_RESERVATION}</td>
         <td>${r.ID_VOYAGE}</td>
         <td>${r.TRAJET ?? "-"}</td>
+        <td>${r.POINT_DEPART ?? "-"}</td>
         <td>${r.SIEGES_RESERVATION ?? "-"}</td>
         <td>${formatFCFA(r.MONTANT_TOTAL)}</td>
         <td><span class="badge bg-warning text-dark">En attente</span></td>

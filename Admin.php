@@ -8,9 +8,9 @@
   h2{text-align:center;margin-bottom:20px}
   table{width:100%;border-collapse:collapse;background:#fff}
   th,td{padding:12px;border:1px solid #ddd;text-align:center}
-  th{background:#003366;color:#fff}
+  th{background:#117a36;color:#fff}
   button{padding:6px 12px;border:none;border-radius:4px;cursor:pointer}
-  .valider{background:green;color:#fff}
+  .valider{background:#1ba84b;color:#fff}
 </style>
 </head>
 

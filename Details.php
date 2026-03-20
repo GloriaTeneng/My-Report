@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>Details du voyage - Express Voyage</title>
-  <link rel="stylesheet" href="assets/css/style.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 
@@ -28,7 +29,7 @@
           <strong>Depart :</strong> <span id="detailDepart">-</span>
         </div>
         <div class="col-md-6 info-box">
-          <i class="bi bi-flag-fill text-danger"></i>
+          <i class="fa-solid fa-location-dot text-danger"></i>
           <strong>Destination :</strong> <span id="detailDestination">-</span>
         </div>
       </div>
@@ -62,9 +63,18 @@
       <!-- Conditions -->
       <div class="section-title mt-4">Conditions</div>
       <ul class="list-group list-group-flush">
-        <li class="list-group-item">Arriver 30 minutes avant</li>
-        <li class="list-group-item">Piece d'identite obligatoire</li>
-        <li class="list-group-item">Bagages selon reglementation</li>
+        <li class="list-group-item">
+          <i class="fa-regular fa-clock text-primary me-2"></i>
+          Arriver 30 minutes avant
+        </li>
+        <li class="list-group-item">
+          <i class="fa-regular fa-id-card text-primary me-2"></i>
+          Piece d'identite obligatoire
+        </li>
+        <li class="list-group-item">
+          <i class="fa-solid fa-suitcase text-primary me-2"></i>
+          Bagages selon reglementation
+        </li>
       </ul>
 
       <!-- Actions -->
@@ -115,7 +125,8 @@
       destEl.textContent = v.VILLE_ARRIVE || "-";
       dateEl.textContent = v.DATEDEPART || "-";
       heureEl.textContent = v.HEUREDEPART || "-";
-      typeEl.textContent = v.CATEGORIE || "CLASSIQUE";
+      const typeBus = v.TYPE_BUS || v.CATEGORIE || "CLASSIQUE";
+      typeEl.textContent = String(typeBus).toUpperCase();
       prixEl.textContent = Number(v.COUT || 0).toLocaleString("fr-FR") + " FCFA";
 
       const selectedVoyage = {
@@ -125,7 +136,9 @@
         date: v.DATEDEPART,
         heure: v.HEUREDEPART,
         categorie: v.CATEGORIE,
-        prix: v.COUT
+        prix: v.COUT,
+        busType: v.TYPE_BUS || v.CATEGORIE,
+        capacite: v.CAPACITE_BUS
       };
       localStorage.setItem("selectedVoyage", JSON.stringify(selectedVoyage));
 

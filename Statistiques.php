@@ -108,7 +108,7 @@ async function chargerStatsMensuelles() {
         datasets: [{
           label: "Recettes (FCFA)",
           data: totals,
-          borderColor: "#0d6efd",
+          borderColor: "#1ba84b",
           backgroundColor: "rgba(13, 110, 253, 0.2)",
           tension: 0.3,
           fill: true
@@ -137,3 +137,4 @@ chargerStatsMensuelles();
 </script>
 </body>
 </html>
+
